@@ -6,3 +6,4 @@ numpy
 requests
 httpx
 opencv-python
+python-multipart
