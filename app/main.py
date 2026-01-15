@@ -1,8 +1,8 @@
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.responses import JSONResponse
 import numpy as np
-from .model import MODEL
-from .utils import preprocess_image
+from app.model import MODEL
+from app.utils import preprocess_image  # on utilise la version pour entrée réseau
 
 app = FastAPI(title="Segmentation API")
 
@@ -16,7 +16,8 @@ async def predict(image: UploadFile = File(...)):
         raise HTTPException(status_code=503, detail="Model not loaded")
 
     content = await image.read()
-    X = preprocess_image(content)
+    X, _ = preprocess_image(content)  # on récupère l'image normalisée
+    X = np.expand_dims(X, axis=0)     # batch dimension
 
     preds = MODEL.predict(X)
     mask = np.argmax(preds, axis=-1)[0]
